@@ -37,10 +37,12 @@ class TransactionController extends Controller
             'transaction_date' => 'required|date',
         ]);
 
-        Transaction::create($request->all()); // Új tranzakció mentése
+        // Csak a szükséges mezők mentése
+        Transaction::create($request->only('user_id', 'total_amount', 'transaction_date'));
 
         return redirect()->route('transactions.index')->with('success', 'Tranzakció sikeresen létrehozva!');
     }
+
 
     /**
      * Display the specified resource.
