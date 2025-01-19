@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Models\TransactionProduct;
 use App\Models\Transaction;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
 class TransactionProductController extends Controller
 {
@@ -16,7 +15,17 @@ class TransactionProductController extends Controller
     public function index()
     {
         $transactionProducts = TransactionProduct::with(['transaction', 'product'])->get();
-        return response()->json($transactionProducts, 200); // JSON válasz
+        return view('transaction_products.index', compact('transactionProducts'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        $transactions = Transaction::all();
+        $products = Product::all();
+        return view('transaction_products.create', compact('transactions', 'products'));
     }
 
     /**
@@ -31,9 +40,9 @@ class TransactionProductController extends Controller
             'subtotal' => 'required|numeric|min:0',
         ]);
 
-        $transactionProduct = TransactionProduct::create($request->all());
+        TransactionProduct::create($request->all());
 
-        return response()->json($transactionProduct, 201); // Létrehozott kapcsolat visszaküldése
+        return redirect()->route('transaction-products.index')->with('success', 'Kapcsolat sikeresen létrehozva!');
     }
 
     /**
@@ -41,13 +50,19 @@ class TransactionProductController extends Controller
      */
     public function show(string $id)
     {
-        $transactionProduct = TransactionProduct::with(['transaction', 'product'])->find($id);
+        $transactionProduct = TransactionProduct::with(['transaction', 'product'])->findOrFail($id);
+        return view('transaction_products.show', compact('transactionProduct'));
+    }
 
-        if (!$transactionProduct) {
-            return response()->json(['message' => 'Kapcsolat nem található'], 404);
-        }
-
-        return response()->json($transactionProduct, 200);
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $transactionProduct = TransactionProduct::findOrFail($id);
+        $transactions = Transaction::all();
+        $products = Product::all();
+        return view('transaction_products.edit', compact('transactionProduct', 'transactions', 'products'));
     }
 
     /**
@@ -55,12 +70,6 @@ class TransactionProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $transactionProduct = TransactionProduct::find($id);
-
-        if (!$transactionProduct) {
-            return response()->json(['message' => 'Kapcsolat nem található'], 404);
-        }
-
         $request->validate([
             'transaction_id' => 'required|exists:transactions,id',
             'product_id' => 'required|exists:products,id',
@@ -68,9 +77,10 @@ class TransactionProductController extends Controller
             'subtotal' => 'required|numeric|min:0',
         ]);
 
+        $transactionProduct = TransactionProduct::findOrFail($id);
         $transactionProduct->update($request->all());
 
-        return response()->json($transactionProduct, 200); // Frissített adat visszaküldése
+        return redirect()->route('transaction-products.index')->with('success', 'Kapcsolat sikeresen frissítve!');
     }
 
     /**
@@ -78,14 +88,9 @@ class TransactionProductController extends Controller
      */
     public function destroy(string $id)
     {
-        $transactionProduct = TransactionProduct::find($id);
-
-        if (!$transactionProduct) {
-            return response()->json(['message' => 'Kapcsolat nem található'], 404);
-        }
-
+        $transactionProduct = TransactionProduct::findOrFail($id);
         $transactionProduct->delete();
 
-        return response()->json(['message' => 'Kapcsolat sikeresen törölve'], 200);
+        return redirect()->route('transaction-products.index')->with('success', 'Kapcsolat sikeresen törölve!');
     }
 }
