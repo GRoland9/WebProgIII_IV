@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\Product;
+
 
 class TransactionController extends Controller
 {
@@ -22,8 +24,9 @@ class TransactionController extends Controller
      */
     public function create()
     {
-        $users = User::all(); // Felhasználók listájának lekérése
-        return view('transactions.create', compact('users')); // Nézet átadása
+        $users = User::all(); // Felhasználók lekérése
+        $products = Product::all(); // Termékek lekérése
+        return view('transactions.create', compact('users', 'products'));
     }
 
     /**

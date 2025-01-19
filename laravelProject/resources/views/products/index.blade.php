@@ -164,7 +164,6 @@
                     <td>{{ $product->stock }}</td>
                     <td>
                         <div class="actions">
-                            <a href="{{ route('products.edit', $product->id) }}">Szerkesztés</a>
                             <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')

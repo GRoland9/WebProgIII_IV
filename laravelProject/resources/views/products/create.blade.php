@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Új tranzakció létrehozása</title>
+    <title>Új Termék Hozzáadása</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <!-- Alap CSS -->
@@ -28,6 +28,7 @@
             background-color: var(--background-color);
             color: var(--text-color);
             line-height: 1.6;
+            padding: 2rem;
         }
 
         header {
@@ -37,6 +38,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 2rem;
         }
 
         header h1 {
@@ -56,46 +58,38 @@
         }
 
         .container {
-            max-width: 600px;
-            margin: 3rem auto;
             background: white;
             padding: 2rem;
-            border-radius: 10px;
+            border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        h1 {
-            font-size: 1.8rem;
-            color: var(--secondary-color);
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        form label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        form input,
-        form select,
-        form button {
-            width: 100%;
-            padding: 0.8rem;
+        h2 {
             margin-bottom: 1rem;
-            border: 1px solid #ccc;
+            color: var(--secondary-color);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        label {
+            font-weight: 600;
+        }
+
+        input,
+        button {
+            padding: 0.8rem;
             border-radius: 5px;
+            border: 1px solid #ccc;
             font-size: 1rem;
         }
 
-        form input:focus,
-        form select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 4px rgba(76, 175, 80, 0.4);
-        }
-
-        form button {
+        button {
             background-color: var(--primary-color);
             color: white;
             font-weight: 600;
@@ -103,22 +97,20 @@
             transition: background-color 0.3s ease;
         }
 
-        form button:hover {
+        button:hover {
             background-color: var(--secondary-color);
         }
 
         .back-link {
-            display: block;
-            text-align: center;
+            display: inline-block;
             margin-top: 1rem;
             text-decoration: none;
-            color: var(--secondary-color);
+            color: var(--primary-color);
             font-weight: 600;
-            transition: color 0.3s ease;
         }
 
         .back-link:hover {
-            color: var(--primary-color);
+            color: var(--secondary-color);
         }
     </style>
 </head>
@@ -133,34 +125,21 @@
     </header>
 
     <div class="container">
-        <h1>Új tranzakció létrehozása</h1>
-        <form action="{{ route('transactions.store') }}" method="POST">
+        <h2>Új Termék Hozzáadása</h2>
+        <form action="{{ route('products.store') }}" method="POST">
             @csrf
-            <label for="user_id">Felhasználó:</label>
-            <select name="user_id" id="user_id" required>
-                @foreach ($users as $user)
-                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                @endforeach
-            </select>
+            <label for="name">Termék neve</label>
+            <input type="text" name="name" id="name" placeholder="Add meg a termék nevét" required>
 
-            <label for="product_id">Termék:</label>
-            <select name="product_id" id="product_id" required>
-                @foreach ($products as $product)
-                <option value="{{ $product->id }}">
-                    {{ $product->name }} (Készlet: {{ $product->stock }}, Ár: {{ $product->price }} Ft)
-                </option>
-                @endforeach
-            </select>
+            <label for="price">Ár</label>
+            <input type="number" name="price" id="price" step="0.01" placeholder="Add meg az árat" required>
 
-            <label for="total_amount">Összeg:</label>
-            <input type="number" name="total_amount" id="total_amount" step="0.01" required>
+            <label for="stock">Készlet</label>
+            <input type="number" name="stock" id="stock" placeholder="Add meg a készletet" required>
 
-            <label for="transaction_date">Dátum:</label>
-            <input type="datetime-local" name="transaction_date" id="transaction_date" required>
-
-            <button type="submit">Mentés</button>
+            <button type="submit">Hozzáadás</button>
         </form>
-        <a class="back-link" href="{{ route('transactions.index') }}">Vissza a listához</a>
+        <a href="{{ route('products.index') }}" class="back-link">Vissza a termékek listájához</a>
     </div>
 </body>
 
