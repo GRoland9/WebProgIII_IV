@@ -188,6 +188,7 @@
                     <td>{{ $transaction->total_amount }}</td>
                     <td>{{ $transaction->transaction_date }}</td>
                     <td class="action-buttons">
+                        <a href="{{ route('transactions.edit', $transaction->id) }}" class="edit-button">Szerkesztés</a>
                         <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')

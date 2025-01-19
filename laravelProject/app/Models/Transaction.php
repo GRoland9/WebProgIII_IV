@@ -13,9 +13,15 @@ class Transaction extends Model
         'transaction_date',
     ];
 
+    // Biztosítja, hogy a transaction_date mező Carbon objektum legyen
+    protected $casts = [
+        'transaction_date' => 'datetime',
+    ];
+
     // Kapcsolat a User modellel
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 }
+
