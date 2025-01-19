@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class TransactionController extends Controller
 {
@@ -14,16 +15,7 @@ class TransactionController extends Controller
     public function index()
     {
         $transactions = Transaction::with('user')->get(); // Összes tranzakció lekérése a kapcsolódó felhasználókkal
-        return view('transactions.index', compact('transactions')); // Nézet átadása az adatokkal
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $users = User::all(); // Felhasználók listájának lekérése
-        return view('transactions.create', compact('users')); // Nézet átadása
+        return response()->json($transactions, 200); // JSON válasz
     }
 
     /**
@@ -37,30 +29,23 @@ class TransactionController extends Controller
             'transaction_date' => 'required|date',
         ]);
 
-        // Csak a szükséges mezők mentése
-        Transaction::create($request->only('user_id', 'total_amount', 'transaction_date'));
+        $transaction = Transaction::create($request->only('user_id', 'total_amount', 'transaction_date'));
 
-        return redirect()->route('transactions.index')->with('success', 'Tranzakció sikeresen létrehozva!');
+        return response()->json($transaction, 201); // Új tranzakció létrehozása és visszaküldése
     }
-
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        $transaction = Transaction::with('user')->findOrFail($id); // Tranzakció lekérése ID alapján
-        return view('transactions.show', compact('transaction')); // Nézet megjelenítése
-    }
+        $transaction = Transaction::with('user')->find($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $transaction = Transaction::findOrFail($id); // Tranzakció lekérése ID alapján
-        $users = User::all(); // Felhasználók listájának lekérése
-        return view('transactions.edit', compact('transaction', 'users')); // Nézet átadása
+        if (!$transaction) {
+            return response()->json(['message' => 'Tranzakció nem található'], 404); // Hibaüzenet, ha nem létezik
+        }
+
+        return response()->json($transaction, 200); // Tranzakció visszaküldése
     }
 
     /**
@@ -68,16 +53,21 @@ class TransactionController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $transaction = Transaction::find($id);
+
+        if (!$transaction) {
+            return response()->json(['message' => 'Tranzakció nem található'], 404); // Hibaüzenet
+        }
+
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'total_amount' => 'required|numeric',
             'transaction_date' => 'required|date',
         ]);
 
-        $transaction = Transaction::findOrFail($id);
-        $transaction->update($request->all()); // Tranzakció frissítése
+        $transaction->update($request->only('user_id', 'total_amount', 'transaction_date'));
 
-        return redirect()->route('transactions.index')->with('success', 'Tranzakció sikeresen frissítve!');
+        return response()->json($transaction, 200); // Frissített tranzakció visszaküldése
     }
 
     /**
@@ -85,9 +75,14 @@ class TransactionController extends Controller
      */
     public function destroy(string $id)
     {
-        $transaction = Transaction::findOrFail($id);
+        $transaction = Transaction::find($id);
+
+        if (!$transaction) {
+            return response()->json(['message' => 'Tranzakció nem található'], 404); // Hibaüzenet
+        }
+
         $transaction->delete(); // Tranzakció törlése
 
-        return redirect()->route('transactions.index')->with('success', 'Tranzakció sikeresen törölve!');
+        return response()->json(['message' => 'Tranzakció sikeresen törölve'], 200); // Sikerüzenet
     }
 }

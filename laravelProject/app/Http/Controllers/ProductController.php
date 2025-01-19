@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
@@ -12,16 +13,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all(); // Összes termék lekérése
-        return view('products.index', compact('products')); // Adatok átadása a nézetnek
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('products.create'); // Nézet az új termék létrehozására
+        $products = Product::all();
+        return response()->json($products, 200); // JSON formátumú válasz
     }
 
     /**
@@ -35,9 +28,9 @@ class ProductController extends Controller
             'stock' => 'required|integer',
         ]);
 
-        Product::create($request->all()); // Új termék mentése
+        $product = Product::create($request->all());
 
-        return redirect()->route('products.index')->with('success', 'Termék sikeresen létrehozva!');
+        return response()->json($product, 201); // Új termék létrehozása és visszaküldése
     }
 
     /**
@@ -45,17 +38,13 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $product = Product::findOrFail($id); // Termék lekérése ID alapján
-        return view('products.show', compact('product')); // Nézet megjelenítése
-    }
+        $product = Product::find($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $product = Product::findOrFail($id); // Termék lekérése ID alapján
-        return view('products.edit', compact('product')); // Nézet megjelenítése
+        if (!$product) {
+            return response()->json(['message' => 'Termék nem található'], 404);
+        }
+
+        return response()->json($product, 200);
     }
 
     /**
@@ -63,16 +52,21 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['message' => 'Termék nem található'], 404);
+        }
+
         $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
+            'name' => 'string|max:255',
+            'price' => 'numeric',
+            'stock' => 'integer',
         ]);
 
-        $product = Product::findOrFail($id);
-        $product->update($request->all()); // Termék frissítése
+        $product->update($request->all());
 
-        return redirect()->route('products.index')->with('success', 'Termék sikeresen frissítve!');
+        return response()->json($product, 200); // Frissített termék adatai
     }
 
     /**
@@ -80,9 +74,14 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        $product = Product::findOrFail($id);
-        $product->delete(); // Termék törlése
+        $product = Product::find($id);
 
-        return redirect()->route('products.index')->with('success', 'Termék sikeresen törölve!');
+        if (!$product) {
+            return response()->json(['message' => 'Termék nem található'], 404);
+        }
+
+        $product->delete();
+
+        return response()->json(['message' => 'Termék sikeresen törölve'], 200);
     }
 }
