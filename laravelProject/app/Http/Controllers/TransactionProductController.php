@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TransactionProduct;
+use App\Models\Transaction;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class TransactionProductController extends Controller
@@ -11,7 +14,8 @@ class TransactionProductController extends Controller
      */
     public function index()
     {
-        //
+        $transactionProducts = TransactionProduct::with(['transaction', 'product'])->get();
+        return view('transaction_products.index', compact('transactionProducts'));
     }
 
     /**
@@ -19,7 +23,9 @@ class TransactionProductController extends Controller
      */
     public function create()
     {
-        //
+        $transactions = Transaction::all();
+        $products = Product::all();
+        return view('transaction_products.create', compact('transactions', 'products'));
     }
 
     /**
@@ -27,7 +33,16 @@ class TransactionProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'transaction_id' => 'required|exists:transactions,id',
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'subtotal' => 'required|numeric|min:0',
+        ]);
+
+        TransactionProduct::create($request->all());
+
+        return redirect()->route('transaction-products.index')->with('success', 'Kapcsolat sikeresen létrehozva!');
     }
 
     /**
@@ -35,7 +50,8 @@ class TransactionProductController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $transactionProduct = TransactionProduct::with(['transaction', 'product'])->findOrFail($id);
+        return view('transaction_products.show', compact('transactionProduct'));
     }
 
     /**
@@ -43,7 +59,10 @@ class TransactionProductController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $transactionProduct = TransactionProduct::findOrFail($id);
+        $transactions = Transaction::all();
+        $products = Product::all();
+        return view('transaction_products.edit', compact('transactionProduct', 'transactions', 'products'));
     }
 
     /**
@@ -51,7 +70,17 @@ class TransactionProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'transaction_id' => 'required|exists:transactions,id',
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'subtotal' => 'required|numeric|min:0',
+        ]);
+
+        $transactionProduct = TransactionProduct::findOrFail($id);
+        $transactionProduct->update($request->all());
+
+        return redirect()->route('transaction-products.index')->with('success', 'Kapcsolat sikeresen frissítve!');
     }
 
     /**
@@ -59,6 +88,9 @@ class TransactionProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $transactionProduct = TransactionProduct::findOrFail($id);
+        $transactionProduct->delete();
+
+        return redirect()->route('transaction-products.index')->with('success', 'Kapcsolat sikeresen törölve!');
     }
 }

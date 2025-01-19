@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -11,7 +13,8 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        //
+        $transactions = Transaction::with('user')->get(); // Összes tranzakció lekérése a kapcsolódó felhasználókkal
+        return view('transactions.index', compact('transactions')); // Nézet átadása az adatokkal
     }
 
     /**
@@ -19,7 +22,8 @@ class TransactionController extends Controller
      */
     public function create()
     {
-        //
+        $users = User::all(); // Felhasználók listájának lekérése
+        return view('transactions.create', compact('users')); // Nézet átadása
     }
 
     /**
@@ -27,7 +31,15 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'total_amount' => 'required|numeric',
+            'transaction_date' => 'required|date',
+        ]);
+
+        Transaction::create($request->all()); // Új tranzakció mentése
+
+        return redirect()->route('transactions.index')->with('success', 'Tranzakció sikeresen létrehozva!');
     }
 
     /**
@@ -35,7 +47,8 @@ class TransactionController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $transaction = Transaction::with('user')->findOrFail($id); // Tranzakció lekérése ID alapján
+        return view('transactions.show', compact('transaction')); // Nézet megjelenítése
     }
 
     /**
@@ -43,7 +56,9 @@ class TransactionController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $transaction = Transaction::findOrFail($id); // Tranzakció lekérése ID alapján
+        $users = User::all(); // Felhasználók listájának lekérése
+        return view('transactions.edit', compact('transaction', 'users')); // Nézet átadása
     }
 
     /**
@@ -51,7 +66,16 @@ class TransactionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'total_amount' => 'required|numeric',
+            'transaction_date' => 'required|date',
+        ]);
+
+        $transaction = Transaction::findOrFail($id);
+        $transaction->update($request->all()); // Tranzakció frissítése
+
+        return redirect()->route('transactions.index')->with('success', 'Tranzakció sikeresen frissítve!');
     }
 
     /**
@@ -59,6 +83,9 @@ class TransactionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $transaction = Transaction::findOrFail($id);
+        $transaction->delete(); // Tranzakció törlése
+
+        return redirect()->route('transactions.index')->with('success', 'Tranzakció sikeresen törölve!');
     }
 }
