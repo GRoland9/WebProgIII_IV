@@ -1,0 +1,23 @@
+<h2>Termékek Listája</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Termék Neve</th>
+            <th>Ár</th>
+            <th>Leírás</th>
+            <th>Műveletek</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let product of products">
+            <td>{{ product.name }}</td>
+            <td>{{ product.price }}</td>
+            <td>{{ product.description }}</td>
+            <td>
+                <button [routerLink]="['/products/edit', product.id]">Szerkesztés</button>
+                <button (click)="deleteProduct(product.id)">Törlés</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<button routerLink="/products/add">Új Termék Hozzáadása</button>

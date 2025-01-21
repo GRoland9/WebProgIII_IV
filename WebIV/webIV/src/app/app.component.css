@@ -1,0 +1,46 @@
+/* Alap stílusok az egész alkalmazásra */
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    /* Modern betűtípus */
+    background: linear-gradient(120deg, #f0f4f8, #d9e9f7);
+    /* Lágy színátmenet háttér */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    /* A képernyő teljes magasságát lefedi */
+}
+
+nav {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+nav a {
+    text-decoration: none;
+    font-size: 1.2rem;
+    color: #007bff;
+    /* Modern kék szín */
+    margin: 0 15px;
+    transition: color 0.3s ease;
+}
+
+nav a:hover {
+    color: #0056b3;
+    /* Sötétebb kék, amikor fölé viszed az egeret */
+}
+
+nav a.active {
+    font-weight: bold;
+    border-bottom: 2px solid #007bff;
+    /* Aktív link kiemelése */
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #ccc;
+    /* Szürke vonal */
+    margin: 20px 0;
+}

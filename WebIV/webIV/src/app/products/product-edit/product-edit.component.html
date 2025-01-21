@@ -1,0 +1,20 @@
+<h2>Termék Szerkesztése</h2>
+<form *ngIf="product" (ngSubmit)="saveProduct()">
+    <label for="name">Név:</label>
+    <input id="name" [(ngModel)]="product.name" name="name" required placeholder="Termék neve" />
+
+    <label for="price">Ár:</label>
+    <input id="price" type="number" [(ngModel)]="product.price" name="price" required placeholder="Termék ára" />
+
+    <label for="description">Leírás:</label>
+    <textarea id="description" [(ngModel)]="product.description" name="description"
+        placeholder="Termék leírása"></textarea>
+
+    <button type="submit">Mentés</button>
+    <button type="button" (click)="cancelEdit()">Mégse</button>
+</form>
+
+<div *ngIf="!product">
+    <p>Hiba: A terméket nem találom.</p>
+    <button routerLink="/products">Vissza a termékek listájához</button>
+</div>

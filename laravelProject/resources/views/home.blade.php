@@ -115,9 +115,8 @@
 
     <section class="hero">
         <div>
-            <h2>Üdvözöllek a Laravel Projektben!</h2>
-            <p>Egy modern költségvetési rendszer, amely megkönnyíti a tranzakciók, termékek és adatok kezelését.</p>
-            <button onclick="window.location.href='{{ route('transactions.index') }}'">Kezdd el most</button>
+            <h2>Ghiczy Roland - Laravel Projekt!</h2>
+            <button onclick="window.location.href='{{ route('transactions.index') }}'">Start</button>
         </div>
     </section>
 
